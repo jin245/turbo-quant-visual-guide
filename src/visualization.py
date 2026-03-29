@@ -471,28 +471,45 @@ def plot_summary_table(results, save_path="outputs/figures/summary_table.png"):
     # テーブル描画
     col_labels = ["Method", "Config", "Memory (bits)", "IP Error", "Recon MSE"]
     n_rows = len(rows)
-    row_height = 0.4
-    fig_height = row_height * (n_rows + 1) + 0.6  # +1 for header, +0.6 for title
 
-    fig, ax = plt.subplots(figsize=(10, fig_height))
+    n_cols = len(col_labels)
+    # 行の高さの比率: タイトル行 + ヘッダ行 + データ行
+    total_rows = n_rows + 2  # +1 title, +1 header
+    row_h = 1.0 / total_rows
+
+    fig, ax = plt.subplots(figsize=(10, 0.32 * total_rows))
     ax.axis("off")
 
+    # タイトルバー（表の上に直結する矩形 + テキスト）
+    gap = row_h * 0.35  # タイトルと表の間の隙間
+    title_y = 1.0 - row_h
+    ax.add_patch(plt.Rectangle(
+        (0, title_y), 1.0, row_h,
+        transform=ax.transAxes, facecolor="white",
+        edgecolor="none", clip_on=False,
+    ))
+    ax.text(0.5, title_y + row_h / 2,
+            "Quantization Methods: Comparison Summary",
+            transform=ax.transAxes, ha="center", va="center",
+            fontsize=13, fontweight="bold", color="black")
+
+    # テーブル本体（タイトルバーの下に配置、gap 分だけ下げる）
     table = ax.table(
         cellText=rows,
         colLabels=col_labels,
         loc="center",
         cellLoc="center",
+        bbox=[0.0, 0.0, 1.0, title_y - gap],
     )
     table.auto_set_font_size(False)
     table.set_fontsize(10)
-    table.scale(1, 1.4)
 
     # ヘッダ行の色
-    for j in range(len(col_labels)):
+    for j in range(n_cols):
         table[0, j].set_facecolor("#4472C4")
         table[0, j].set_text_props(color="white", fontweight="bold")
 
-    # 行の色分け（手法ごと）
+    # データ行の色分け（手法ごと）
     method_colors = {
         "Baseline": "#F2F2F2",
         "Lloyd-Max": "#FFF2CC",
@@ -502,12 +519,10 @@ def plot_summary_table(results, save_path="outputs/figures/summary_table.png"):
     }
     for i, row in enumerate(rows):
         color = method_colors.get(row[0], "white")
-        for j in range(len(col_labels)):
+        for j in range(n_cols):
             table[i + 1, j].set_facecolor(color)
 
-    ax.set_title("Quantization Methods: Comparison Summary",
-                 fontsize=14, fontweight="bold", pad=10)
-    plt.savefig(save_path, dpi=150, bbox_inches="tight", pad_inches=0.1)
+    plt.savefig(save_path, dpi=150, bbox_inches="tight", pad_inches=0.4)
     plt.close()
     print(f"  Saved: {save_path}")
 
