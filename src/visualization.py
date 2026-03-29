@@ -471,8 +471,10 @@ def plot_summary_table(results, save_path="outputs/figures/summary_table.png"):
     # テーブル描画
     col_labels = ["Method", "Config", "Memory (bits)", "IP Error", "Recon MSE"]
     n_rows = len(rows)
+    row_height = 0.4
+    fig_height = row_height * (n_rows + 1) + 0.6  # +1 for header, +0.6 for title
 
-    fig, ax = plt.subplots(figsize=(10, 0.5 * n_rows + 1.5))
+    fig, ax = plt.subplots(figsize=(10, fig_height))
     ax.axis("off")
 
     table = ax.table(
@@ -483,7 +485,7 @@ def plot_summary_table(results, save_path="outputs/figures/summary_table.png"):
     )
     table.auto_set_font_size(False)
     table.set_fontsize(10)
-    table.scale(1, 1.6)
+    table.scale(1, 1.4)
 
     # ヘッダ行の色
     for j in range(len(col_labels)):
@@ -504,9 +506,8 @@ def plot_summary_table(results, save_path="outputs/figures/summary_table.png"):
             table[i + 1, j].set_facecolor(color)
 
     ax.set_title("Quantization Methods: Comparison Summary",
-                 fontsize=14, fontweight="bold", pad=20)
-    plt.tight_layout()
-    plt.savefig(save_path, dpi=150, bbox_inches="tight")
+                 fontsize=14, fontweight="bold", pad=10)
+    plt.savefig(save_path, dpi=150, bbox_inches="tight", pad_inches=0.1)
     plt.close()
     print(f"  Saved: {save_path}")
 
