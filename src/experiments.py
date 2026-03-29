@@ -1,7 +1,7 @@
 """
 実験モジュール
 
-4つの手法（Baseline、Lloyd-Max、QJL、Hybrid）の実験を実行し、
+5つの手法（Baseline、Lloyd-Max、QJL、Multi-bit RP、TurboQuant）の実験を実行し、
 内積誤差・再構成誤差・メモリ使用量を計算して構造化された結果を返す。
 """
 
@@ -10,7 +10,7 @@ import numpy as np
 from .utils import compute_memory_bits
 from .qjl import qjl_convergence, qjl_convergence_unbiased
 from .lloyd_max import lloyd_max_train, quantize
-from .hybrid import hybrid_estimate
+from .multibit_rp import multibit_rp_estimate
 from .turbo_quant import turbo_quant_prod_estimate
 
 
@@ -143,9 +143,9 @@ def run_qjl_experiments(x, y, m_values=None, n_trials=30, seed=123):
     return results, conv_data
 
 
-def run_hybrid_experiments(x, y, configs=None, n_trials=30, seed=456):
+def run_multibit_rp_experiments(x, y, configs=None, n_trials=30, seed=456):
     """
-    Hybrid: 各 (m, b) 設定で内積推定の統計量を計算する。
+    Multi-bit RP: 各 (m, b) 設定で内積推定の統計量を計算する。
 
     Parameters
     ----------
@@ -173,14 +173,14 @@ def run_hybrid_experiments(x, y, configs=None, n_trials=30, seed=456):
         estimates = []
         for trial in range(n_trials):
             rng = np.random.default_rng(seed + trial * 1000 + m * 10 + b)
-            est = hybrid_estimate(x, y, m, b, rng)
+            est = multibit_rp_estimate(x, y, m, b, rng)
             estimates.append(est)
 
         estimates = np.array(estimates)
         errors = np.abs(estimates - true_ip)
 
         results.append({
-            "method": "Hybrid",
+            "method": "Multi-bit RP",
             "config": f"m={m},b={b}",
             "m": m,
             "b": b,
@@ -188,7 +188,7 @@ def run_hybrid_experiments(x, y, configs=None, n_trials=30, seed=456):
             "ip_std": float(np.std(estimates)),
             "ip_error_mean": float(np.mean(errors)),
             "reconstruction_mse": None,   # 再構成不可
-            "memory_bits": compute_memory_bits("hybrid", m=m, b=b),
+            "memory_bits": compute_memory_bits("multibit_rp", m=m, b=b),
         })
 
     return results
@@ -267,7 +267,7 @@ def run_all_experiments(x, y, d, seed=42):
         'baseline': Baseline の結果
         'lloyd_max': Lloyd-Max の結果リスト
         'qjl': QJL の結果リスト
-        'hybrid': Hybrid の結果リスト
+        'multibit_rp': Multi-bit RP の結果リスト
         'qjl_conv_data': QJL 収束データ（グラフ用）
         'm_values': QJL/グラフ用の射影数リスト
     """
@@ -284,8 +284,8 @@ def run_all_experiments(x, y, d, seed=42):
         x, y, m_values=m_values, n_trials=30, seed=seed + 1
     )
 
-    print("  Running Hybrid experiments...")
-    hybrid = run_hybrid_experiments(x, y, seed=seed + 2)
+    print("  Running Multi-bit RP experiments...")
+    multibit_rp = run_multibit_rp_experiments(x, y, seed=seed + 2)
 
     print("  Running TurboQuant experiments...")
     turbo_quant = run_turbo_quant_experiments(x, y, d, seed=seed + 3)
@@ -302,7 +302,7 @@ def run_all_experiments(x, y, d, seed=42):
         "baseline": baseline,
         "lloyd_max": lloyd_max,
         "qjl": qjl,
-        "hybrid": hybrid,
+        "multibit_rp": multibit_rp,
         "turbo_quant": turbo_quant,
         "qjl_conv_data": qjl_conv_data,
         "qjl_conv_unbiased": qjl_conv_unbiased,
@@ -341,10 +341,10 @@ def print_summary_table(results):
         if r["m"] in [100, 500, 1000, 2000]:
             print(f"{'QJL':<12} {r['config']:<14} {r['memory_bits']:>8} b  {r['ip_error_mean']:>11.6f}  {'N/A':>11}")
 
-    # Hybrid（代表的なもの）
-    for r in results["hybrid"]:
+    # Multi-bit RP（代表的なもの）
+    for r in results["multibit_rp"]:
         if (r["m"], r["b"]) in [(50, 2), (100, 2), (50, 4), (100, 4), (200, 4)]:
-            print(f"{'Hybrid':<12} {r['config']:<14} {r['memory_bits']:>8} b  {r['ip_error_mean']:>11.6f}  {'N/A':>11}")
+            print(f"{'Multi-bitRP':<12} {r['config']:<14} {r['memory_bits']:>8} b  {r['ip_error_mean']:>11.6f}  {'N/A':>11}")
 
     # TurboQuant
     for r in results.get("turbo_quant", []):

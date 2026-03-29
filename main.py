@@ -8,7 +8,7 @@ QJL vs MSE最小化量子化 — 5手法比較プロジェクト
   1. Baseline    — float32 のまま内積を計算（基準）
   2. Lloyd-Max   — MSE最小化スカラー量子化 → 再構成は良いが内積にバイアス
   3. QJL         — ランダム射影 + 1ビット量子化 → 内積を不偏推定
-  4. Hybrid      — ランダム射影 + 低ビット量子化 → メモリと精度のバランス
+  4. Multi-bit RP — ランダム射影 + 低ビット量子化 → メモリと精度のバランス
   5. TurboQuant  — MSE量子化 + 残差QJL → 再構成と内積の両立
 
 実行すると以下を生成する:
@@ -53,7 +53,7 @@ def main():
 
     print("=" * 60)
     print("  5-Method Quantization Comparison")
-    print("  Baseline / Lloyd-Max / QJL / Hybrid / TurboQuant")
+    print("  Baseline / Lloyd-Max / QJL / Multi-bit RP / TurboQuant")
     print("=" * 60)
     print(f"  Dimension       d = {d}")
     print(f"  True inner product = {true_ip:.6f}")

@@ -113,7 +113,7 @@ def turbo_quant_mse(x, b, rotation_seed=0, lloyd_seed=42):
 
 
 # ============================================================
-# TurboQuant Prod: 2段階アプローチ（核心）
+# TurboQuant Prod: 2段階アプローチ
 # ============================================================
 
 def turbo_quant_prod_estimate(x, y_vec, b, m_qjl,

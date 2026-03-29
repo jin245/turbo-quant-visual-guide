@@ -353,7 +353,6 @@ def plot_comparison_memory_vs_error(results,
     """
     メモリ使用量 vs 内積誤差の比較グラフを全手法で作成する。
 
-    これがプロジェクトの核心となるグラフ。
     同じメモリ予算でどの手法が最も内積を正確に推定できるかが一目で分かる。
 
     x軸: メモリ使用量（ビット/ベクトル、対数スケール）
@@ -378,20 +377,20 @@ def plot_comparison_memory_vs_error(results,
     ax.plot(qjl_mem, qjl_err, "o-", color="steelblue", markersize=7,
             linewidth=1.5, label="QJL (1-bit proj.)", zorder=4)
 
-    # --- Hybrid（ビット数ごとに分けてプロット）---
-    hybrid_b_values = sorted(set(r["b"] for r in results["hybrid"]))
-    hybrid_colors = {2: "mediumseagreen", 4: "mediumpurple"}
-    hybrid_markers = {2: "^", 4: "v"}
+    # --- Multi-bit RP（ビット数ごとに分けてプロット）---
+    mrp_b_values = sorted(set(r["b"] for r in results["multibit_rp"]))
+    mrp_colors = {2: "mediumseagreen", 4: "mediumpurple"}
+    mrp_markers = {2: "^", 4: "v"}
 
-    for b_val in hybrid_b_values:
-        h_filtered = [r for r in results["hybrid"] if r["b"] == b_val]
+    for b_val in mrp_b_values:
+        h_filtered = [r for r in results["multibit_rp"] if r["b"] == b_val]
         h_filtered.sort(key=lambda r: r["memory_bits"])
         h_mem = [r["memory_bits"] for r in h_filtered]
         h_err = [r["ip_error_mean"] for r in h_filtered]
-        color = hybrid_colors.get(b_val, "gray")
-        marker = hybrid_markers.get(b_val, "D")
+        color = mrp_colors.get(b_val, "gray")
+        marker = mrp_markers.get(b_val, "D")
         ax.plot(h_mem, h_err, f"{marker}-", color=color, markersize=7,
-                linewidth=1.5, label=f"Hybrid ({b_val}-bit proj.)", zorder=4)
+                linewidth=1.5, label=f"Multi-bit RP ({b_val}-bit)", zorder=4)
 
     # --- TurboQuant ---
     tq_data = results.get("turbo_quant", [])
@@ -453,11 +452,11 @@ def plot_summary_table(results, save_path="outputs/figures/summary_table.png"):
                 f"{r['ip_error_mean']:.6f}", "N/A",
             ])
 
-    # Hybrid（代表的な設定）
-    for r in results["hybrid"]:
+    # Multi-bit RP（代表的な設定）
+    for r in results["multibit_rp"]:
         if (r["m"], r["b"]) in [(50, 2), (100, 2), (50, 4), (100, 4), (200, 4)]:
             rows.append([
-                "Hybrid", r["config"], f"{r['memory_bits']}",
+                "Multi-bit RP", r["config"], f"{r['memory_bits']}",
                 f"{r['ip_error_mean']:.6f}", "N/A",
             ])
 
@@ -514,7 +513,7 @@ def plot_summary_table(results, save_path="outputs/figures/summary_table.png"):
         "Baseline": "#F2F2F2",
         "Lloyd-Max": "#FFF2CC",
         "QJL": "#D6E4F0",
-        "Hybrid": "#E2EFDA",
+        "Multi-bit RP": "#E2EFDA",
         "TurboQuant": "#FCE4EC",
     }
     for i, row in enumerate(rows):

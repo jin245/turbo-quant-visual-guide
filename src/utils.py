@@ -109,13 +109,13 @@ def compute_memory_bits(method, d=None, m=None, b=None):
     Parameters
     ----------
     method : str
-        'baseline', 'lloyd_max', 'qjl', 'hybrid'
+        'baseline', 'lloyd_max', 'qjl', 'multibit_rp'
     d : int or None
         ベクトルの次元数（baseline, lloyd_max で必要）
     m : int or None
-        射影数（qjl, hybrid で必要）
+        射影数（qjl, multibit_rp で必要）
     b : int or None
-        ビット数（lloyd_max, hybrid で必要）
+        ビット数（lloyd_max, multibit_rp で必要）
 
     Returns
     -------
@@ -126,7 +126,7 @@ def compute_memory_bits(method, d=None, m=None, b=None):
       - Baseline (float32): 32 × d ビット
       - Lloyd-Max b-bit:     b × d ビット
       - QJL m 射影:          m × 1 ビット（各射影は符号1ビット）
-      - Hybrid m 射影 b-bit: m × b ビット
+      - Multi-bit RP m 射影 b-bit: m × b ビット
     """
     if method == "baseline":
         return 32 * d
@@ -134,7 +134,7 @@ def compute_memory_bits(method, d=None, m=None, b=None):
         return b * d
     elif method == "qjl":
         return m
-    elif method == "hybrid":
+    elif method == "multibit_rp":
         return m * b
     else:
         raise ValueError(f"Unknown method: {method}")

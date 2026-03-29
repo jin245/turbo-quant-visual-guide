@@ -1,5 +1,5 @@
 """
-ハイブリッド手法：ランダム射影 + 低ビット量子化
+Multi-bit Random Projection（多ビットランダム射影）
 
 QJL（1ビット）と通常のランダム射影（float32）の間を補間する手法。
 射影後の値を b ビットに量子化することで、メモリ使用量と内積精度の
@@ -49,9 +49,9 @@ def uniform_quantize(values, b, val_range=(-3.0, 3.0)):
     return quantized
 
 
-def hybrid_estimate(x, y, m, b, rng, val_range=(-3.0, 3.0)):
+def multibit_rp_estimate(x, y, m, b, rng, val_range=(-3.0, 3.0)):
     """
-    ハイブリッド手法による内積推定。
+    Multi-bit Random Projection による内積推定。
 
     手順:
       1. ランダム射影行列 S ~ N(0,1) を生成（shape: m × d）
