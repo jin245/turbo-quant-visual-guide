@@ -77,7 +77,7 @@ $$x = \begin{pmatrix} 0.81 \\ 0.51 \\ 0.30 \end{pmatrix}, \quad y = \begin{pmatr
 
 **Step 1**: ランダム射影行列 $S \in \mathbb{R}^{4 \times 3}$ を生成（各要素 $\sim N(0, 1)$）
 
-$$S = \begin{pmatrix} -0.7 & -0.2 & +1.7 \\ +0.7 & -1.6 & \phantom{+}0.0 \\ -0.6 & +0.1 & -1.6 \\ +0.2 & +0.2 & +1.6 \end{pmatrix}$$
+$$S = \begin{pmatrix} -0.7 & -0.2 & +1.7 \\ +0.7 & -1.6 & +0.0 \\ -0.6 & +0.1 & -1.6 \\ +0.2 & +0.2 & +1.6 \end{pmatrix}$$
 
 **Step 2**: 両ベクトルを射影 — $Sx$ と $Sy$ を計算
 
